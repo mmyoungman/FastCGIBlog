@@ -1,6 +1,19 @@
 #include <fcgi_stdio.h>
 #include <stdlib.h>
 
+struct blogPost {
+  char *title;
+  char *date;
+  char *author;
+  char *body;
+};
+
+int stringsEqual(char *a, char *b) {
+  while((*a != '\0') && (*a == *b))
+    a++, b++;
+  return ((*a == '\0') && (*b == '\0'));
+}
+
 int printPage(int *count) {
         printf("Content-Type: text/html;\ncharset=UTF-8\n");
         printf("Status: 200 OK\n\n");
@@ -126,14 +139,12 @@ int printPage(int *count) {
         printf("</aside>\n");
         printf("\n");
         
-        char postHeading[1280];
-        FILE *stream = fopen("posts.txt", "r");
 
-        while( fgets(postHeading, 1280, stream) != NULL ) {
+        if(stringsEqual(getenv("REQUEST_URI"), "/admin")) {
           printf("<article>\n");
           printf("  <fieldset>\n");
           printf("  <h3>");
-          printf("%s", postHeading);
+          printf("You're in the secret admin area!");
           printf("</h3>\n");
           printf("  <p>Lorem ipsum</p>\n");
           printf("  <p>Blog post date</p>\n");
@@ -142,6 +153,25 @@ int printPage(int *count) {
           printf("  </fieldset>\n");
           printf("</article>\n");
           printf("\n");
+        }
+        else {
+          char postHeading[1280];
+          FILE *stream = fopen("posts.txt", "r");
+
+          while( fgets(postHeading, 1280, stream) != NULL ) {
+            printf("<article>\n");
+            printf("  <fieldset>\n");
+            printf("  <h3>");
+            printf("%s", postHeading);
+            printf("</h3>\n");
+            printf("  <p>Lorem ipsum</p>\n");
+            printf("  <p>Blog post date</p>\n");
+            printf("  <p>Blog post categories</p>\n");
+            printf("  <p>Blog post comments</p>\n");
+            printf("  </fieldset>\n");
+            printf("</article>\n");
+            printf("\n");
+          }
         }
 
         printf("<footer>Request %d</footer>\n", ++*count);
