@@ -1,13 +1,52 @@
-#include <fcgi_stdio.h>
+//#include <fcgi_stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include "random.cpp"
 
 int main(int argc, char *argv[]) {
   //List files in posts/ dir, stick them into an array
+
+  int dirListSize = sizeof(char)*1024;
+  int dirListCount = 0;
+  char **dirList = (char**)malloc(sizeof(char)*1024);
+
+  DIR *d;
+  struct dirent *dir;
+  d = opendir("posts/");
+  if(d) {
+    while((dir = readdir(d)) != NULL) {
+      if(stringsAreEqual(dir->d_name, ".") || stringsAreEqual(dir->d_name, "..")) {
+        continue;
+      }
+
+      if(dirListSize < (sizeof(char)*1024) * dirListCount) {
+        dirList = (char**)realloc(dirList, (sizeof(char)*1024) * dirListCount);
+        dirListSize += sizeof(char)*1024;
+      }
+
+      dirList[dirListCount] = dir->d_name;
+      dirListCount++;
+    }
+    closedir(d);
+  }
+
+  for(int i = 0; i < dirListCount; i++) {
+    printf("%s\n", dirList[i]);
+  }
+
   //Loop through files, adding them to array of posts
   //while grabbing title,author,categories,etc.
-  char line[1280];
-  FILE *stream = fopen("posts.txt", "r");
-  if(fgets(line, 1280, stream) != 0) {
-  }
+  //char line[1280];
+  //FILE *stream = fopen("posts.txt", "r");
+  //if(fgets(line, 1280, stream) != 0) {
+  //}
+
+
+
+
+
+
 
     /*
     int count = 0;
