@@ -1,9 +1,15 @@
 #include <fcgi_stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+  //List files in posts/ dir, stick them into an array
+  //Loop through files, adding them to array of posts
+  //while grabbing title,author,categories,etc.
+  char line[1280];
+  FILE *stream = fopen("posts.txt", "r");
+  if(fgets(line, 1280, stream) != 0) {
+  }
+
+    /*
     int count = 0;
     while(FCGI_Accept() >= 0)
     {
@@ -79,4 +85,5 @@ int main(int argc, char *argv[])
       }
 
     }
+    */
 }

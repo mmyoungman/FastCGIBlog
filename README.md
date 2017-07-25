@@ -11,5 +11,5 @@
 * Put misc/nginx.conf in /etc/nginx
 * Generate .htpasswd using apache2-utils (sudo htpasswd -c /etc/nginx/.htpasswd admin)
 * sudo systemctl start nginx
-* g++ blog.c -o blog.fcgi -lfcgi
+* ./build
 * spawn-fcgi -a127.0.0.1 -p9000 -n ./blog.fcgi
