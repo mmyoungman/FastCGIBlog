@@ -11,6 +11,6 @@
 * Put misc/nginx.conf in /etc/nginx
 * Generate .htpasswd using apache2-utils (sudo htpasswd -c /etc/nginx/.htpasswd admin)
 * sudo systemctl start nginx
-* ./build.sh
-* ./run.sh
+* ./code/build.sh
+* ./code/run.sh
 * Go to http://localhost:80

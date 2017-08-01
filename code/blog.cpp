@@ -1,10 +1,54 @@
-#ifndef PAGES
-#define PAGES
+#include <fcgi_stdio.h>
+#include <stdlib.h>
 
-//#include <fcgi_stdio.h>
-#include "random.cpp"
+#if DEBUG
+#define assert(expression) if(!(expression)) { *(int*)0 = 0; }
+#else
+#define assert(expression)
+#endif
 
-int printPage(int *requestCount, char *type) {
+int stringLength(char* str) {
+  char* strPtr = str;
+  while(*strPtr != '\0') { strPtr++; }
+  return strPtr - str;
+}
+
+char* stringCopy(char *s) {
+  char* copy = (char*)malloc(sizeof(char)*(stringLength(s)+1));
+  char* sPtr = s;
+  char* copyPtr = copy;
+  while(*sPtr != '\0') {
+    *copyPtr = *sPtr;
+    copyPtr++, sPtr++;
+  }
+  *copyPtr = '\0';
+  return copy;
+}
+
+int stringsAreEqual(char *a, char *b) {
+  while((*a != '\0') && (*a == *b))
+    a++, b++;
+  return ((*a == '\0') && (*b == '\0'));
+}
+
+struct blogPost {
+  char* title;
+  char* author;
+  char* categories;
+  int dateDay;
+  int dateMonth;
+  int dateYear;
+
+  int bodySize;
+  char *body;
+};
+
+struct blogPosts {
+    blogPost** posts;
+    int num;
+};
+
+int printPage(blogPosts allPosts, char* type, int* requestCount) {
   *requestCount += *requestCount + 1;
 
   if(stringsAreEqual(type, "/")) {
@@ -132,6 +176,7 @@ int printPage(int *requestCount, char *type) {
         printf("</aside>\n");
         printf("\n");
         
+          /*
           char postHeading[1280];
           FILE *stream = fopen("posts.txt", "r");
 
@@ -149,6 +194,25 @@ int printPage(int *requestCount, char *type) {
             printf("</article>\n");
             printf("\n");
           }
+          */
+
+        for(int i = 0; i < allPosts.num; i++) {
+            printf("<article>\n");
+            printf("  <fieldset>\n");
+            printf("  <h3>");
+            printf("%s", allPosts.posts[i]->title);
+            printf("</h3>\n");
+            printf("  <p>Author: %s</p>\n", allPosts.posts[i]->author);
+            printf("  %s\n", allPosts.posts[i]->body);
+            printf("  <p>Categories: %s</p>\n", allPosts.posts[i]->categories);
+            printf("  <p>Blog post date: %d-%d-%d</p>\n", allPosts.posts[i]->dateDay,
+                                                          allPosts.posts[i]->dateMonth,
+                                                          allPosts.posts[i]->dateYear);
+            printf("  <p>Blog post comments</p>\n");
+            printf("  </fieldset>\n");
+            printf("</article>\n");
+            printf("\n");          
+        }
 
         printf("<footer>Request %d</footer>\n", *requestCount);
         printf("\n");
@@ -171,4 +235,34 @@ int printPage(int *requestCount, char *type) {
   }
 }
 
-#endif
+int main(int argc, char *argv[]) {
+
+    blogPosts allPosts;
+    allPosts.num = 1;
+
+    allPosts.posts = (blogPost**)malloc(sizeof(blogPost*));
+    allPosts.posts[0] = (blogPost*)malloc(sizeof(blogPost));
+
+    allPosts.posts[0]->title = stringCopy("A new blog post!");
+    allPosts.posts[0]->author = stringCopy("Mark");
+    allPosts.posts[0]->categories = stringCopy("blog,test,category,anothercategory");
+    allPosts.posts[0]->dateDay = 1;
+    allPosts.posts[0]->dateMonth = 8;
+    allPosts.posts[0]->dateYear = 2017;
+
+    allPosts.posts[0]->body = stringCopy("<p>This is the post body!!!</p>");
+
+    // Read posts from posts/
+    // Save each post in array of posts
+
+    int requestCount = 0;
+    //assert(1 == 0);
+    while(FCGI_Accept() >= 0) {
+      printPage(allPosts, getenv("REQUEST_URI"), &requestCount);
+      /*
+      printf("Content-Type: text/plain;\ncharset=UTF-8\n");
+      printf("Status: 200 OK\n\n");
+      printf("title: %s\n", allPosts.posts[0]->title);
+      */
+    }
+}
