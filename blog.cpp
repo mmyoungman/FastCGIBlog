@@ -5,9 +5,9 @@
 #include "random.cpp"
 
 struct blogPost {
-  char title[256];
-  char author[128];
-  char categories[256];
+  char* title;
+  char* author;
+  char* categories;
   int dateDay;
   int dateMonth;
   int dateYear;
@@ -16,13 +16,20 @@ struct blogPost {
   char *body;
 };
 
+struct blogPosts {
+    blogPost** posts;
+    int num;
+};
+
+blogPosts blogPosts;
+
 int main(int argc, char *argv[]) {
 
     // Read posts from posts/
     // Save each post in array of posts
 
     int requestCount = 0;
-    assert(1 == 1);
+    //assert(1 == 0);
     while(FCGI_Accept() >= 0) {
       printPage(&requestCount, getenv("REQUEST_URI"));
     }

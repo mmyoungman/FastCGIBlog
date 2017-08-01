@@ -1,2 +1,6 @@
 blog.fcgi
 test
+Blog.config
+Blog.creator*
+Blog.files
+Blog.includes

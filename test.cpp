@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
         dirListSize += sizeof(char)*1024;
       }
 
+      assert(stringLength(dir->d_name) < 1024);
       dirList[dirListCount] = dir->d_name;
       dirListCount++;
     }

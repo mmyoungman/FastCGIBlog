@@ -1,3 +1,4 @@
 #!/bin/bash
-
-g++ -g -DDEBUG=1 -Wno-write-strings -lfcgi -o blog.fcgi blog.cpp
+debug="-g -DDEBUG=1"
+flags="-Wno-write-strings"
+g++ $debug $flags -lfcgi -o blog.fcgi blog.cpp
