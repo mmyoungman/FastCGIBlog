@@ -34,7 +34,7 @@ int stringsAreEqual(char *a, char *b) {
 struct blogPost {
   char* title;
   char* author;
-  char* categories;
+  //char* categories;
   int dateDay;
   int dateMonth;
   int dateYear;
@@ -49,7 +49,7 @@ struct blogPosts {
 };
 
 int printPage(blogPosts allPosts, char* type, int* requestCount) {
-  *requestCount += *requestCount + 1;
+  *requestCount += 1;
 
   if(stringsAreEqual(type, "/")) {
         printf("Content-Type: text/html;\ncharset=UTF-8\n");
@@ -204,11 +204,9 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
             printf("</h3>\n");
             printf("  <p>Author: %s</p>\n", allPosts.posts[i]->author);
             printf("  %s\n", allPosts.posts[i]->body);
-            printf("  <p>Categories: %s</p>\n", allPosts.posts[i]->categories);
-            printf("  <p>Blog post date: %d-%d-%d</p>\n", allPosts.posts[i]->dateDay,
+            printf("  <p>Blog post date: %02d-%02d-%04d</p>\n", allPosts.posts[i]->dateDay,
                                                           allPosts.posts[i]->dateMonth,
                                                           allPosts.posts[i]->dateYear);
-            printf("  <p>Blog post comments</p>\n");
             printf("  </fieldset>\n");
             printf("</article>\n");
             printf("\n");          
@@ -245,7 +243,6 @@ int main(int argc, char *argv[]) {
 
     allPosts.posts[0]->title = stringCopy("A new blog post!");
     allPosts.posts[0]->author = stringCopy("Mark");
-    allPosts.posts[0]->categories = stringCopy("blog,test,category,anothercategory");
     allPosts.posts[0]->dateDay = 1;
     allPosts.posts[0]->dateMonth = 8;
     allPosts.posts[0]->dateYear = 2017;
@@ -256,7 +253,6 @@ int main(int argc, char *argv[]) {
     // Save each post in array of posts
 
     int requestCount = 0;
-    //assert(1 == 0);
     while(FCGI_Accept() >= 0) {
       printPage(allPosts, getenv("REQUEST_URI"), &requestCount);
       /*
