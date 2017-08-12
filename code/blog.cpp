@@ -31,10 +31,15 @@ int stringsAreEqual(char *a, char *b) {
   return ((*a == '\0') && (*b == '\0'));
 }
 
+int stringBeginsWith(char* a, char *b) {
+  while((a* != '\0') && (*a == *b))
+    a++, b++;
+  return a* == '\0';
+}
+
 struct blogPost {
   char* title;
   char* author;
-  //char* categories;
   int dateDay;
   int dateMonth;
   int dateYear;
@@ -176,26 +181,6 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
         printf("</aside>\n");
         printf("\n");
         
-          /*
-          char postHeading[1280];
-          FILE *stream = fopen("posts.txt", "r");
-
-          while( fgets(postHeading, 1280, stream) != NULL ) {
-            printf("<article>\n");
-            printf("  <fieldset>\n");
-            printf("  <h3>");
-            printf("%s", postHeading);
-            printf("</h3>\n");
-            printf("  <p>Lorem ipsum</p>\n");
-            printf("  <p>Blog post date</p>\n");
-            printf("  <p>Blog post categories</p>\n");
-            printf("  <p>Blog post comments</p>\n");
-            printf("  </fieldset>\n");
-            printf("</article>\n");
-            printf("\n");
-          }
-          */
-
         for(int i = 0; i < allPosts.num; i++) {
             printf("<article>\n");
             printf("  <fieldset>\n");
@@ -228,8 +213,8 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
         printf("Content-Type: text/html;\ncharset=UTF-8\n");
         printf("Status: 200 OK\n\n");
         printf("Page not found! Or could eventually be a page particular to this blog post: %s\n", type);
-    // Match type string to particular blog post
-    // If no post is found, 
+        // Match type string to particular blog post
+        // If no post is found, 
   }
 }
 

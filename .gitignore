@@ -1,6 +1,10 @@
+# Binaries
 blog.fcgi
 test
+
+# Qt Creator
 Blog.config
-Blog.creator*
+Blog.creator
+Blog.creator.user
 Blog.files
 Blog.includes

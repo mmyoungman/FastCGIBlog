@@ -2,9 +2,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
-#include "random.cpp"
 
-int main(int argc, char *argv[]) {
+#if DEBUG
+#define assert(expression) if(!(expression)) { *(int*)0 = 0; }
+#else
+#define assert(expression)
+#endif
+
+int stringLength(char* str) {
+  char* strPtr = str;
+  while(*strPtr != '\0') { strPtr++; }
+  return strPtr - str;
+}
+
+char* stringCopy(char *s) {
+  char* copy = (char*)malloc(sizeof(char)*(stringLength(s)+1));
+  char* sPtr = s;
+  char* copyPtr = copy;
+  while(*sPtr != '\0') {
+    *copyPtr = *sPtr;
+    copyPtr++, sPtr++;
+  }
+  *copyPtr = '\0';
+  return copy;
+}
+
+int stringsAreEqual(char *a, char *b) {
+  while((*a != '\0') && (*a == *b))
+    a++, b++;
+  return ((*a == '\0') && (*b == '\0'));
+}
+
+main(int argc, char *argv[]) {
   //List files in posts/ dir, stick them into an array
 
   int dirListSize = sizeof(char)*1024;
