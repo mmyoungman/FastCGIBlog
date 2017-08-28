@@ -1,57 +1,7 @@
-#include <fcgi_stdio.h>
-#include <stdlib.h>
+//#ifndef PAGE_H
+//#define PAGE_H
 
-#if DEBUG
-#define assert(expression) if(!(expression)) { *(int*)0 = 0; }
-#else
-#define assert(expression)
-#endif
-
-int stringLength(char* str) {
-  char* strPtr = str;
-  while(*strPtr != '\0') { strPtr++; }
-  return strPtr - str;
-}
-
-char* stringCopy(char *s) {
-  char* copy = (char*)malloc(sizeof(char)*(stringLength(s)+1));
-  char* sPtr = s;
-  char* copyPtr = copy;
-  while(*sPtr != '\0') {
-    *copyPtr = *sPtr;
-    copyPtr++, sPtr++;
-  }
-  *copyPtr = '\0';
-  return copy;
-}
-
-int stringsAreEqual(char *a, char *b) {
-  while((*a != '\0') && (*a == *b))
-    a++, b++;
-  return ((*a == '\0') && (*b == '\0'));
-}
-
-int stringBeginsWith(char* a, char *b) {
-  while((a* != '\0') && (*a == *b))
-    a++, b++;
-  return a* == '\0';
-}
-
-struct blogPost {
-  char* title;
-  char* author;
-  int dateDay;
-  int dateMonth;
-  int dateYear;
-
-  int bodySize;
-  char *body;
-};
-
-struct blogPosts {
-    blogPost** posts;
-    int num;
-};
+#include "main.h"
 
 int printPage(blogPosts allPosts, char* type, int* requestCount) {
   *requestCount += 1;
@@ -210,6 +160,7 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
         printf("You're in the secret admin area!\n");
   }
   else {
+    
         printf("Content-Type: text/html;\ncharset=UTF-8\n");
         printf("Status: 200 OK\n\n");
         printf("Page not found! Or could eventually be a page particular to this blog post: %s\n", type);
@@ -218,32 +169,4 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
   }
 }
 
-int main(int argc, char *argv[]) {
-
-    blogPosts allPosts;
-    allPosts.num = 1;
-
-    allPosts.posts = (blogPost**)malloc(sizeof(blogPost*));
-    allPosts.posts[0] = (blogPost*)malloc(sizeof(blogPost));
-
-    allPosts.posts[0]->title = stringCopy("A new blog post!");
-    allPosts.posts[0]->author = stringCopy("Mark");
-    allPosts.posts[0]->dateDay = 1;
-    allPosts.posts[0]->dateMonth = 8;
-    allPosts.posts[0]->dateYear = 2017;
-
-    allPosts.posts[0]->body = stringCopy("<p>This is the post body!!!</p>");
-
-    // Read posts from posts/
-    // Save each post in array of posts
-
-    int requestCount = 0;
-    while(FCGI_Accept() >= 0) {
-      printPage(allPosts, getenv("REQUEST_URI"), &requestCount);
-      /*
-      printf("Content-Type: text/plain;\ncharset=UTF-8\n");
-      printf("Status: 200 OK\n\n");
-      printf("title: %s\n", allPosts.posts[0]->title);
-      */
-    }
-}
+//#endif
