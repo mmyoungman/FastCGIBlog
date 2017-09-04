@@ -115,11 +115,11 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
         printf("  <fieldset>\n");
         printf("  <h3>Menu</h3>\n");
         printf("  <ul>\n");
-        printf("    <li><a href='#'>Search</a></li>\n");
+        //printf("    <li><a href='#'>Search</a></li>\n");
         printf("    <li><a href='#'>Home</a></li>\n");
-        printf("    <li><a href='#'>About</a></li>\n");
-        printf("    <li><a href='#'>Contact</a></li>\n");
-        printf("    <li><a href='#'>Categories</a></li>\n");
+        //printf("    <li><a href='#'>About</a></li>\n");
+        //printf("    <li><a href='#'>Contact</a></li>\n");
+        //printf("    <li><a href='#'>Categories</a></li>\n");
         printf("  </ul>\n");
 
         printf("  <h3>Archive</h3>\n");
@@ -137,7 +137,7 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
             printf("  <h3>");
             printf("%s", allPosts.posts[i]->title);
             printf("</h3>\n");
-            printf("  <p>Blog post date: %02d-%02d-%04d</p>\n", allPosts.posts[i]->dateDay,
+            printf("  <p>Date: %02d-%02d-%04d</p>\n", allPosts.posts[i]->dateDay,
                                                           allPosts.posts[i]->dateMonth,
                                                           allPosts.posts[i]->dateYear);
             printf("  <p>Author: %s</p>\n", allPosts.posts[i]->author);
