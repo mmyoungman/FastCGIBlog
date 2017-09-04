@@ -6,11 +6,10 @@ struct blogPost {
     char* title;
     char* uri;
     char* author;
-    char* dateDay;
-    char* dateMonth;
-    char* dateYear;
+    int dateDay;
+    int dateMonth;
+    int dateYear;
 
-    int bodySize;
     char *body;
 };
 
@@ -81,9 +80,9 @@ int main(int argc, char *argv[]) {
                 line++;
                 int listSize = 0;
                 char** splitList = stringSplit(line, '-', &listSize);
-                allPosts.posts[i]->dateDay = stringCopy(splitList[0]);
-                allPosts.posts[i]->dateMonth = stringCopy(splitList[1]);
-                allPosts.posts[i]->dateYear = stringCopy(splitList[2]);
+                allPosts.posts[i]->dateDay = stringToInt(stringCopy(splitList[0]));
+                allPosts.posts[i]->dateMonth = stringToInt(stringCopy(splitList[1]));
+                allPosts.posts[i]->dateYear = stringToInt(stringCopy(splitList[2]));
             }
             else if(stringBeginsWith(line, "body:")) {
                 while(fgets(line, 1024, fp) != 0) {
@@ -95,7 +94,7 @@ int main(int argc, char *argv[]) {
                         stringConcat(allPosts.posts[i]->body, line);
                     }
                 }
-                //break;
+                break;
             }
         }
     }

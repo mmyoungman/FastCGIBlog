@@ -96,8 +96,8 @@ void stringConcat(char* str, char* addition) {
 main(int argc, char *argv[]) {
 
   char* str = stringCopy("2017");
-  int year = stringToInt(str);
-  printf("Year: %d\n", year);
+  int year = stringToInt(stringCopy(str));
+  printf("Year: %04d\n", year);
 
   str = stringCopy("25-07-2017");
   int listLength = 0;

@@ -21,6 +21,12 @@ int stringLength(char* str) {
 int stringToInt(char* str) {
     int result = 0;
     char* strPtr = str;
+
+    // Strip non-numeric char from the end of the string
+    while(*strPtr >= 48 && *strPtr <= 57) { strPtr++; }
+    *strPtr = '\0';
+    strPtr = str;
+
     int length = stringLength(str);
     while(length > 0) {
         length--;
