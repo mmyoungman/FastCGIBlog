@@ -9,10 +9,30 @@
 #define assert(expression)
 #endif
 
+int mathPower(int num, int pow) {
+    int result = 1;
+    for(int i = 0; i < pow; i++) {
+        result *= num;
+    }
+    return result;
+}
+
 int stringLength(char* str) {
   char* strPtr = str;
   while(*strPtr != '\0') { strPtr++; }
   return strPtr - str;
+}
+
+int stringToInt(char* str) {
+    int result = 0;
+    char* strPtr = str;
+    int length = stringLength(str);
+    while(length > 0) {
+        length--;
+        result += (*strPtr - 48) * mathPower(10, length);
+        strPtr++;
+    }
+    return result;
 }
 
 char* stringCopy(char *s) {
@@ -33,9 +53,65 @@ int stringsAreEqual(char *a, char *b) {
   return ((*a == '\0') && (*b == '\0'));
 }
 
-main(int argc, char *argv[]) {
-  //List files in posts/ dir, stick them into an array
+char** stringSplit(char* str, char c, int* size) {
+  int numStrs = 1;
+  char* strPtr = str;
+  while(*strPtr != '\0') {
+    if(*strPtr == c) {
+      *strPtr = '\0';
+      numStrs++;
+    }
+    strPtr++;
+  }
+  char** result = (char**)malloc(sizeof(char*)*numStrs);
+  char* strStart = str;
+  strPtr = strStart;
+  int i = 0;
+  while(numStrs > 0) {
+    if(*strPtr == '\0') {
+      numStrs--;
+      result[i] = strStart;
+      strStart = strPtr + 1;
+      i++;
+    }
+    strPtr++;
+  }
+  *size = i;
+  return result;
+}
 
+void stringConcat(char* str, char* addition) {
+  int newLength = stringLength(str) + stringLength(addition) + 1;
+  str = (char*)realloc(str, sizeof(char) * newLength);
+  char* strPtr = str;
+  while(*strPtr != '\0') { strPtr++; }
+  char* addPtr = addition;
+  while(*addPtr != '\0') {
+    *strPtr = *addPtr;
+    strPtr++, addPtr++;
+  }
+  *strPtr = '\0';
+}
+
+main(int argc, char *argv[]) {
+
+  char* str = stringCopy("2017");
+  int year = stringToInt(str);
+  printf("Year: %d\n", year);
+
+  str = stringCopy("25-07-2017");
+  int listLength = 0;
+  char** list = stringSplit(str, '-', &listLength);
+  for(int i = 0; i < listLength; i++) {
+    printf("%s\n", list[i]);
+  }
+
+  str = stringCopy("Test");
+  stringConcat(str, "");
+  printf("%s\n", str);
+
+  /*
+  //List files in posts/ dir, stick them into an array
   int dirListSize = sizeof(char)*1024;
   int dirListCount = 0;
   char **dirList = (char**)malloc(sizeof(char)*1024);
@@ -73,13 +149,6 @@ main(int argc, char *argv[]) {
   //if(fgets(line, 1280, stream) != 0) {
   //}
 
-
-
-
-
-
-
-    /*
     int count = 0;
     while(FCGI_Accept() >= 0)
     {

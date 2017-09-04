@@ -1,16 +1,33 @@
-//#ifndef UTILS_H
-//#define UTILS_H
-
 #if DEBUG
 #define assert(expression) if(!(expression)) { *(int*)0 = 0; }
 #else
 #define assert(expression)
 #endif
 
+int mathPower(int num, int pow) {
+    int result = 1;
+    for(int i = 0; i < pow; i++) {
+        result *= num;
+    }
+    return result;
+}
+
 int stringLength(char* str) {
   char* strPtr = str;
   while(*strPtr != '\0') { strPtr++; }
   return strPtr - str;
+}
+
+int stringToInt(char* str) {
+    int result = 0;
+    char* strPtr = str;
+    int length = stringLength(str);
+    while(length > 0) {
+        length--;
+        result += (*strPtr - 48) * mathPower(10, length);
+        strPtr++;
+    }
+    return result;
 }
 
 char* stringCopy(char *s) {
@@ -31,7 +48,7 @@ int stringsAreEqual(char *a, char *b) {
   return ((*a == '\0') && (*b == '\0'));
 }
 
-int stringBeginsWith(char* str, char *start) {
+int stringBeginsWith(char* str, char* start) {
   char* strPtr = str;
   while((*start != '\0') && (*start == *strPtr))
     strPtr++, start++;
@@ -77,5 +94,3 @@ void stringConcat(char* str, char* addition) {
   }
   *strPtr = '\0';
 }
-
-//#endif

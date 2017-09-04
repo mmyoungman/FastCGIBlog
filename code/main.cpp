@@ -50,6 +50,7 @@ int main(int argc, char *argv[]) {
     // Transfer data to blogPosts struct
     for(int i = 0; i < dirListCount; i++) {
         allPosts.posts[i] = (blogPost*)malloc(sizeof(blogPost));
+        allPosts.posts[i]->body = stringCopy("");
         FILE* fp;
         char* line = (char*)malloc(sizeof(char)*1024);
 
@@ -69,28 +70,32 @@ int main(int argc, char *argv[]) {
                 while(*line != ':') { line++; }
                 line++;
                 allPosts.posts[i]->uri = stringCopy(line);
-                //allPosts.posts[i]->uri = stringCopy("a-title");
             }
             else if(stringBeginsWith(line, "author:")) {
                 while(*line != ':') { line++; }
                 line++;
                 allPosts.posts[i]->author = stringCopy(line);
-                //allPosts.posts[i]->author = stringCopy("Mark");
             }
             else if(stringBeginsWith(line, "date:")) {
-                //while(*line != ':') { line++; }
-                //line++;
-                //int listSize = 0;
-                //char** splitList = stringSplit(line, '-', &listSize);
-                //allPosts.posts[i]->dateDay = splitList[0];
-                //allPosts.posts[i]->dateMonth = splitList[1];
-                //allPosts.posts[i]->dateYear = splitList[2];
-                allPosts.posts[i]->dateDay = stringCopy("4");
-                allPosts.posts[i]->dateMonth = stringCopy("7");
-                allPosts.posts[i]->dateYear = stringCopy("2017");
+                while(*line != ':') { line++; }
+                line++;
+                int listSize = 0;
+                char** splitList = stringSplit(line, '-', &listSize);
+                allPosts.posts[i]->dateDay = stringCopy(splitList[0]);
+                allPosts.posts[i]->dateMonth = stringCopy(splitList[1]);
+                allPosts.posts[i]->dateYear = stringCopy(splitList[2]);
             }
             else if(stringBeginsWith(line, "body:")) {
-                allPosts.posts[i]->body = stringCopy("POST BODY!!!\n\n");
+                while(fgets(line, 1024, fp) != 0) {
+                    if(stringsAreEqual(allPosts.posts[i]->body, "")) {
+                        allPosts.posts[i]->body = stringCopy(line);
+                    }
+                    else { 
+                        stringConcat(allPosts.posts[i]->body, "\n");
+                        stringConcat(allPosts.posts[i]->body, line);
+                    }
+                }
+                //break;
             }
         }
     }

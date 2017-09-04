@@ -132,13 +132,13 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
             printf("  <h3>");
             printf("%s", allPosts.posts[i]->title);
             printf("</h3>\n");
-            printf("  <p>Author: %s</p>\n", allPosts.posts[i]->author);
-            printf("  %s\n", allPosts.posts[i]->body);
-            //printf("  TEST\n");
-            //printf("  %s\n", dirList[1]);
-            printf("  <p>Blog post date: %02d-%02d-%04d</p>\n", allPosts.posts[i]->dateDay,
+            printf("  <p>Date: %s-%s-%s</p>\n", allPosts.posts[i]->dateDay,
                                                           allPosts.posts[i]->dateMonth,
                                                           allPosts.posts[i]->dateYear);
+            printf("  <p>Author: %s</p>\n", allPosts.posts[i]->author);
+            printf("  %s\n", allPosts.posts[i]->body);
+            //printf("  <p>Blog post date: %02d-%02d-%04d</p>\n", allPosts.posts[i]->dateDay,
+
             printf("  </fieldset>\n");
             printf("</article>\n");
             printf("\n");          
