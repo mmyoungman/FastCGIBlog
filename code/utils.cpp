@@ -31,10 +31,11 @@ int stringsAreEqual(char *a, char *b) {
   return ((*a == '\0') && (*b == '\0'));
 }
 
-int stringBeginsWith(char* a, char *b) {
-  while((*a != '\0') && (*a == *b))
-    a++, b++;
-  return *a == '\0';
+int stringBeginsWith(char* str, char *start) {
+  char* strPtr = str;
+  while((*start != '\0') && (*start == *strPtr))
+    strPtr++, start++;
+  return *start == '\0';
 }
 
 char** stringSplit(char* str, char c, int* size) {
@@ -62,6 +63,19 @@ char** stringSplit(char* str, char c, int* size) {
   }
   *size = i;
   return result;
+}
+
+void stringConcat(char* str, char* addition) {
+  int newLength = stringLength(str) + stringLength(addition) + 1;
+  str = (char*)realloc(str, sizeof(char) * newLength);
+  char* strPtr = str;
+  while(*strPtr != '\0') { strPtr++; }
+  char* addPtr = addition;
+  while(*addPtr != '\0') {
+    *strPtr = *addPtr;
+    strPtr++, addPtr++;
+  }
+  *strPtr = '\0';
 }
 
 //#endif

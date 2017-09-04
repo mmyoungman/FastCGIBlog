@@ -46,6 +46,7 @@ main(int argc, char *argv[]) {
   if(d) {
     while((dir = readdir(d)) != NULL) {
       if(stringsAreEqual(dir->d_name, ".") || stringsAreEqual(dir->d_name, "..")) {
+        printf("Skipping . and ..\n");
         continue;
       }
 
