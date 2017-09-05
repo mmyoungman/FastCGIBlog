@@ -99,6 +99,28 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // Sort posts by date, newest to oldest
+    for(int i = 0; i < allPosts.num; i++) {
+        int newestIndex = i;
+        int newestDay = -1;
+        int newestMonth = -1;
+        int newestYear = -1;
+        int j = i;
+        for(j = i; j < allPosts.num; j++) {
+            if((newestYear < allPosts.posts[j]->dateYear) || 
+            (newestYear == allPosts.posts[j]->dateYear && newestMonth < allPosts.posts[j]->dateMonth) ||
+            (newestMonth == allPosts.posts[j]->dateMonth && newestDay < allPosts.posts[j]->dateDay)) {
+                newestIndex = j;
+                newestYear = allPosts.posts[j]->dateYear;
+                newestMonth = allPosts.posts[j]->dateMonth;
+                newestDay = allPosts.posts[j]->dateDay;
+            }
+        }
+        blogPost* temp = allPosts.posts[i];
+        allPosts.posts[i] = allPosts.posts[newestIndex];
+        allPosts.posts[newestIndex] = temp;
+    }
+
     int requestCount = 0;
     while(FCGI_Accept() >= 0) {
         printPage(allPosts, getenv("REQUEST_URI"), &requestCount);

@@ -9,6 +9,22 @@
 #define assert(expression)
 #endif
 
+struct blogPost {
+    char* title;
+    char* uri;
+    char* author;
+    int dateDay;
+    int dateMonth;
+    int dateYear;
+
+    char *body;
+};
+
+struct blogPosts {
+    blogPost** posts;
+    int num;
+};
+
 int mathPower(int num, int pow) {
     int result = 1;
     for(int i = 0; i < pow; i++) {
@@ -23,9 +39,36 @@ int stringLength(char* str) {
   return strPtr - str;
 }
 
+int stringBeginsWith(char* str, char* start) {
+  char* strPtr = str;
+  while((*start != '\0') && (*start == *strPtr)) {
+    strPtr++, start++;
+  }
+  return *start == '\0';
+}
+
+int stringEndsWith(char* str, char* end) {
+  char* strPtr = str;
+  int endLength = stringLength(end);
+  while(*end != '\0') { end++; }
+  while(*strPtr != '\0') { strPtr++; }
+
+  while(*strPtr == *end && endLength > 0) {
+    strPtr--, end--;
+    endLength--;
+  }
+  return *strPtr == *end;
+}
+
 int stringToInt(char* str) {
     int result = 0;
     char* strPtr = str;
+
+    // Strip non-numeric char from the end of the string
+    while(*strPtr >= 48 && *strPtr <= 57) { strPtr++; }
+    *strPtr = '\0';
+    strPtr = str;
+
     int length = stringLength(str);
     while(length > 0) {
         length--;
@@ -95,6 +138,108 @@ void stringConcat(char* str, char* addition) {
 
 main(int argc, char *argv[]) {
 
+    blogPosts allPosts;
+
+    // Read posts from posts/ dir
+    int dirListCount = 0;
+    char **dirList = (char**)malloc(sizeof(char*)*1024);
+
+    DIR *d;
+    struct dirent *dir;
+    d = opendir("/home/mark/Desktop/MarkBackup20170829/Programming 20170829/fastcgi-blog/posts/");
+    if(d) {
+        while((dir = readdir(d)) != NULL) {
+            if(stringsAreEqual(dir->d_name, ".") || stringsAreEqual(dir->d_name, "..") || !stringEndsWith(dir->d_name, ".txt")) {
+                continue;
+            }
+            dirList[dirListCount] = stringCopy(dir->d_name);
+            dirListCount++;
+        }
+        closedir(d);
+    }
+
+    allPosts.num = dirListCount;
+    allPosts.posts = (blogPost**)malloc( sizeof(blogPost*)*allPosts.num );
+
+    // Transfer data to blogPosts struct
+    for(int i = 0; i < dirListCount; i++) {
+        allPosts.posts[i] = (blogPost*)malloc(sizeof(blogPost));
+        allPosts.posts[i]->body = stringCopy("");
+        FILE* fp;
+        char* line = (char*)malloc(sizeof(char)*1024);
+
+        char* path = stringCopy("/home/mark/Desktop/MarkBackup20170829/Programming 20170829/fastcgi-blog/posts/");
+        stringConcat(path, dirList[i]);
+
+        fp = fopen(path, "r");
+        if(fp == NULL) { return -1; }
+
+        while(fgets(line, 1024, fp) != 0) {
+            if(stringBeginsWith(line, "title:")) {
+                while(*line != ':') { line++; }
+                line++;
+                allPosts.posts[i]->title = stringCopy(line);
+            }
+            else if(stringBeginsWith(line, "uri:")) {
+                while(*line != ':') { line++; }
+                line++;
+                allPosts.posts[i]->uri = stringCopy(line);
+            }
+            else if(stringBeginsWith(line, "author:")) {
+                while(*line != ':') { line++; }
+                line++;
+                allPosts.posts[i]->author = stringCopy(line);
+            }
+            else if(stringBeginsWith(line, "date:")) {
+                while(*line != ':') { line++; }
+                line++;
+                int listSize = 0;
+                char** splitList = stringSplit(line, '-', &listSize);
+                allPosts.posts[i]->dateDay = stringToInt(stringCopy(splitList[0]));
+                allPosts.posts[i]->dateMonth = stringToInt(stringCopy(splitList[1]));
+                allPosts.posts[i]->dateYear = stringToInt(stringCopy(splitList[2]));
+            }
+            else if(stringBeginsWith(line, "body:")) {
+                while(fgets(line, 1024, fp) != 0) {
+                    if(stringsAreEqual(allPosts.posts[i]->body, "")) {
+                        allPosts.posts[i]->body = stringCopy(line);
+                    }
+                    else { 
+                        stringConcat(allPosts.posts[i]->body, "\n");
+                        stringConcat(allPosts.posts[i]->body, line);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    // Sort posts by date, newest to oldest
+    ///*
+    for(int i = 0; i < allPosts.num; i++) {
+        int newestIndex = i;
+        int newestDay = -1;
+        int newestMonth = -1;
+        int newestYear = -1;
+        int j = i;
+        for(j = i; j < allPosts.num; j++) {
+            if((newestYear < allPosts.posts[j]->dateYear) || 
+               (newestYear == allPosts.posts[j]->dateYear && newestMonth < allPosts.posts[j]->dateMonth) ||
+               (newestMonth == allPosts.posts[j]->dateMonth && newestDay < allPosts.posts[j]->dateDay)) {
+                newestIndex = j;
+                newestYear = allPosts.posts[j]->dateYear;
+                newestMonth = allPosts.posts[j]->dateMonth;
+                newestDay = allPosts.posts[j]->dateDay;
+            }
+        }
+        blogPost* temp = allPosts.posts[i];
+        allPosts.posts[i] = allPosts.posts[newestIndex];
+        allPosts.posts[newestIndex] = temp;
+    }
+    //*/
+
+
+  /*
   char* str = stringCopy("2017");
   int year = stringToInt(stringCopy(str));
   printf("Year: %04d\n", year);
@@ -110,7 +255,7 @@ main(int argc, char *argv[]) {
   stringConcat(str, "");
   printf("%s\n", str);
 
-  /*
+
   //List files in posts/ dir, stick them into an array
   int dirListSize = sizeof(char)*1024;
   int dirListCount = 0;
