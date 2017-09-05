@@ -49,16 +49,31 @@ char* stringCopy(char *s) {
 }
 
 int stringsAreEqual(char *a, char *b) {
-  while((*a != '\0') && (*a == *b))
+  while((*a != '\0') && (*a == *b)) {
     a++, b++;
+  }
   return ((*a == '\0') && (*b == '\0'));
 }
 
 int stringBeginsWith(char* str, char* start) {
   char* strPtr = str;
-  while((*start != '\0') && (*start == *strPtr))
+  while((*start != '\0') && (*start == *strPtr)) {
     strPtr++, start++;
+  }
   return *start == '\0';
+}
+
+int stringEndsWith(char* str, char* end) {
+  char* strPtr = str;
+  int endLength = stringLength(end);
+  while(*end != '\0') { end++; }
+  while(*strPtr != '\0') { strPtr++; }
+
+  while(*strPtr == *end && endLength > 0) {
+    strPtr--, end--;
+    endLength--;
+  }
+  return *strPtr == *end;
 }
 
 char** stringSplit(char* str, char c, int* size) {

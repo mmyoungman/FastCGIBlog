@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     d = opendir("../posts/");
     if(d) {
         while((dir = readdir(d)) != NULL) {
-            if(stringsAreEqual(dir->d_name, ".") || stringsAreEqual(dir->d_name, "..")) {
+            if(stringsAreEqual(dir->d_name, ".") || stringsAreEqual(dir->d_name, "..") || !stringEndsWith(dir->d_name, ".txt")) {
                 continue;
             }
             dirList[dirListCount] = stringCopy(dir->d_name);
