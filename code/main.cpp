@@ -21,9 +21,9 @@ struct blogPosts {
 #include "utils.cpp"
 #include "page.cpp"
 
-int main(int argc, char *argv[]) {
+blogPosts loadPosts(char* postDir) {
 
-    blogPosts allPosts;
+    blogPosts postsObj;
 
     // Read posts from posts/ dir
     int dirListCount = 0;
@@ -43,13 +43,13 @@ int main(int argc, char *argv[]) {
         closedir(d);
     }
 
-    allPosts.num = dirListCount;
-    allPosts.posts = (blogPost**)malloc( sizeof(blogPost*)*allPosts.num );
-
+    postsObj.num = dirListCount;
+    postsObj.posts = (blogPost**)malloc( sizeof(blogPost*)*postsObj.num );
+    
     // Transfer data to blogPosts struct
     for(int i = 0; i < dirListCount; i++) {
-        allPosts.posts[i] = (blogPost*)malloc(sizeof(blogPost));
-        allPosts.posts[i]->body = stringCopy("");
+        postsObj.posts[i] = (blogPost*)malloc(sizeof(blogPost));
+        postsObj.posts[i]->body = stringCopy("");
         FILE* fp;
         char* line = (char*)malloc(sizeof(char)*1024);
 
@@ -57,41 +57,41 @@ int main(int argc, char *argv[]) {
         stringConcat(path, dirList[i]);
 
         fp = fopen(path, "r");
-        if(fp == NULL) { return -1; }
+        //if(fp == NULL) { return NULL; }
 
         while(fgets(line, 1024, fp) != 0) {
             if(stringBeginsWith(line, "title:")) {
                 while(*line != ':') { line++; }
                 line++;
-                allPosts.posts[i]->title = stringCopy(line);
+                postsObj.posts[i]->title = stringCopy(line);
             }
             else if(stringBeginsWith(line, "uri:")) {
                 while(*line != ':') { line++; }
                 line++;
-                allPosts.posts[i]->uri = stringCopy(line);
+                postsObj.posts[i]->uri = stringCopy(line);
             }
             else if(stringBeginsWith(line, "author:")) {
                 while(*line != ':') { line++; }
                 line++;
-                allPosts.posts[i]->author = stringCopy(line);
+                postsObj.posts[i]->author = stringCopy(line);
             }
             else if(stringBeginsWith(line, "date:")) {
                 while(*line != ':') { line++; }
                 line++;
                 int listSize = 0;
                 char** splitList = stringSplit(line, '-', &listSize);
-                allPosts.posts[i]->dateDay = stringToInt(stringCopy(splitList[0]));
-                allPosts.posts[i]->dateMonth = stringToInt(stringCopy(splitList[1]));
-                allPosts.posts[i]->dateYear = stringToInt(stringCopy(splitList[2]));
+                postsObj.posts[i]->dateDay = stringToInt(stringCopy(splitList[0]));
+                postsObj.posts[i]->dateMonth = stringToInt(stringCopy(splitList[1]));
+                postsObj.posts[i]->dateYear = stringToInt(stringCopy(splitList[2]));
             }
             else if(stringBeginsWith(line, "body:")) {
                 while(fgets(line, 1024, fp) != 0) {
-                    if(stringsAreEqual(allPosts.posts[i]->body, "")) {
-                        allPosts.posts[i]->body = stringCopy(line);
+                    if(stringsAreEqual(postsObj.posts[i]->body, "")) {
+                        postsObj.posts[i]->body = stringCopy(line);
                     }
                     else { 
-                        stringConcat(allPosts.posts[i]->body, "\n");
-                        stringConcat(allPosts.posts[i]->body, line);
+                        stringConcat(postsObj.posts[i]->body, "\n");
+                        stringConcat(postsObj.posts[i]->body, line);
                     }
                 }
                 break;
@@ -100,26 +100,33 @@ int main(int argc, char *argv[]) {
     }
 
     // Sort posts by date, newest to oldest
-    for(int i = 0; i < allPosts.num; i++) {
+    for(int i = 0; i < postsObj.num; i++) {
         int newestIndex = i;
         int newestDay = -1;
         int newestMonth = -1;
         int newestYear = -1;
         int j = i;
-        for(j = i; j < allPosts.num; j++) {
-            if((newestYear < allPosts.posts[j]->dateYear) || 
-            (newestYear == allPosts.posts[j]->dateYear && newestMonth < allPosts.posts[j]->dateMonth) ||
-            (newestMonth == allPosts.posts[j]->dateMonth && newestDay < allPosts.posts[j]->dateDay)) {
+        for(j = i; j < postsObj.num; j++) {
+            if((newestYear < postsObj.posts[j]->dateYear) || 
+            (newestYear == postsObj.posts[j]->dateYear && newestMonth < postsObj.posts[j]->dateMonth) ||
+            (newestMonth == postsObj.posts[j]->dateMonth && newestDay < postsObj.posts[j]->dateDay)) {
                 newestIndex = j;
-                newestYear = allPosts.posts[j]->dateYear;
-                newestMonth = allPosts.posts[j]->dateMonth;
-                newestDay = allPosts.posts[j]->dateDay;
+                newestYear = postsObj.posts[j]->dateYear;
+                newestMonth = postsObj.posts[j]->dateMonth;
+                newestDay = postsObj.posts[j]->dateDay;
             }
         }
-        blogPost* temp = allPosts.posts[i];
-        allPosts.posts[i] = allPosts.posts[newestIndex];
-        allPosts.posts[newestIndex] = temp;
+        blogPost* temp = postsObj.posts[i];
+        postsObj.posts[i] = postsObj.posts[newestIndex];
+        postsObj.posts[newestIndex] = temp;
     }
+
+    return postsObj;
+}
+
+int main(int argc, char *argv[]) {
+
+    blogPosts allPosts = loadPosts("../posts/");
 
     int requestCount = 0;
     while(FCGI_Accept() >= 0) {
