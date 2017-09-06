@@ -45,7 +45,7 @@ blogPosts loadPosts(char* postDir) {
 
     postsObj.num = dirListCount;
     postsObj.posts = (blogPost**)malloc( sizeof(blogPost*)*postsObj.num );
-    
+
     // Transfer data to blogPosts struct
     for(int i = 0; i < dirListCount; i++) {
         postsObj.posts[i] = (blogPost*)malloc(sizeof(blogPost));
@@ -108,8 +108,8 @@ blogPosts loadPosts(char* postDir) {
         int j = i;
         for(j = i; j < postsObj.num; j++) {
             if((newestYear < postsObj.posts[j]->dateYear) || 
-            (newestYear == postsObj.posts[j]->dateYear && newestMonth < postsObj.posts[j]->dateMonth) ||
-            (newestMonth == postsObj.posts[j]->dateMonth && newestDay < postsObj.posts[j]->dateDay)) {
+               (newestYear == postsObj.posts[j]->dateYear && newestMonth < postsObj.posts[j]->dateMonth) ||
+               (newestMonth == postsObj.posts[j]->dateMonth && newestDay < postsObj.posts[j]->dateDay)) {
                 newestIndex = j;
                 newestYear = postsObj.posts[j]->dateYear;
                 newestMonth = postsObj.posts[j]->dateMonth;

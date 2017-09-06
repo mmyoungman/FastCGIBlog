@@ -13,9 +13,9 @@ int mathPower(int num, int pow) {
 }
 
 int stringLength(char* str) {
-  char* strPtr = str;
-  while(*strPtr != '\0') { strPtr++; }
-  return strPtr - str;
+    char* strPtr = str;
+    while(*strPtr != '\0') { strPtr++; }
+    return strPtr - str;
 }
 
 int stringToInt(char* str) {
@@ -37,81 +37,81 @@ int stringToInt(char* str) {
 }
 
 char* stringCopy(char *s) {
-  char* copy = (char*)malloc(sizeof(char)*(stringLength(s)+1));
-  char* sPtr = s;
-  char* copyPtr = copy;
-  while(*sPtr != '\0') {
-    *copyPtr = *sPtr;
-    copyPtr++, sPtr++;
-  }
-  *copyPtr = '\0';
-  return copy;
+    char* copy = (char*)malloc(sizeof(char)*(stringLength(s)+1));
+    char* sPtr = s;
+    char* copyPtr = copy;
+    while(*sPtr != '\0') {
+        *copyPtr = *sPtr;
+        copyPtr++, sPtr++;
+    }
+    *copyPtr = '\0';
+    return copy;
 }
 
 int stringsAreEqual(char *a, char *b) {
-  while((*a != '\0') && (*a == *b)) {
-    a++, b++;
-  }
-  return ((*a == '\0') && (*b == '\0'));
+    while((*a != '\0') && (*a == *b)) {
+        a++, b++;
+    }
+    return ((*a == '\0') && (*b == '\0'));
 }
 
 int stringBeginsWith(char* str, char* start) {
-  char* strPtr = str;
-  while((*start != '\0') && (*start == *strPtr)) {
-    strPtr++, start++;
-  }
-  return *start == '\0';
+    char* strPtr = str;
+    while((*start != '\0') && (*start == *strPtr)) {
+        strPtr++, start++;
+    }
+    return *start == '\0';
 }
 
 int stringEndsWith(char* str, char* end) {
-  char* strPtr = str;
-  int endLength = stringLength(end);
-  while(*end != '\0') { end++; }
-  while(*strPtr != '\0') { strPtr++; }
+    char* strPtr = str;
+    int endLength = stringLength(end);
+    while(*end != '\0') { end++; }
+    while(*strPtr != '\0') { strPtr++; }
 
-  while(*strPtr == *end && endLength > 0) {
-    strPtr--, end--;
-    endLength--;
-  }
-  return *strPtr == *end;
+    while(*strPtr == *end && endLength > 0) {
+        strPtr--, end--;
+        endLength--;
+    }
+    return *strPtr == *end;
 }
 
 char** stringSplit(char* str, char c, int* size) {
-  int numStrs = 1;
-  char* strPtr = str;
-  while(*strPtr != '\0') {
-    if(*strPtr == c) {
-      *strPtr = '\0';
-      numStrs++;
+    int numStrs = 1;
+    char* strPtr = str;
+    while(*strPtr != '\0') {
+        if(*strPtr == c) {
+            *strPtr = '\0';
+            numStrs++;
+        }
+        strPtr++;
     }
-    strPtr++;
-  }
-  char** result = (char**)malloc(sizeof(char*)*numStrs);
-  char* strStart = str;
-  strPtr = strStart;
-  int i = 0;
-  while(numStrs > 0) {
-    if(*strPtr == '\0') {
-      numStrs--;
-      result[i] = strStart;
-      strStart = strPtr + 1;
-      i++;
+    char** result = (char**)malloc(sizeof(char*)*numStrs);
+    char* strStart = str;
+    strPtr = strStart;
+    int i = 0;
+    while(numStrs > 0) {
+        if(*strPtr == '\0') {
+            numStrs--;
+            result[i] = strStart;
+            strStart = strPtr + 1;
+            i++;
+        }
+        strPtr++;
     }
-    strPtr++;
-  }
-  *size = i;
-  return result;
+    *size = i;
+    return result;
 }
 
 void stringConcat(char* str, char* addition) {
-  int newLength = stringLength(str) + stringLength(addition) + 1;
-  str = (char*)realloc(str, sizeof(char) * newLength);
-  char* strPtr = str;
-  while(*strPtr != '\0') { strPtr++; }
-  char* addPtr = addition;
-  while(*addPtr != '\0') {
-    *strPtr = *addPtr;
-    strPtr++, addPtr++;
-  }
-  *strPtr = '\0';
+    int newLength = stringLength(str) + stringLength(addition) + 1;
+    str = (char*)realloc(str, sizeof(char) * newLength);
+    char* strPtr = str;
+    while(*strPtr != '\0') { strPtr++; }
+    char* addPtr = addition;
+    while(*addPtr != '\0') {
+        *strPtr = *addPtr;
+        strPtr++, addPtr++;
+    }
+    *strPtr = '\0';
 }

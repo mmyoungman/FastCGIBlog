@@ -1,25 +1,25 @@
 int printPage(blogPosts allPosts, char* type, int* requestCount) {
-  *requestCount += 1;
+    *requestCount += 1;
 
-  // Determine whether printing single post or front page
-  int singlePost = -2;
-  for(int i = 0; i < allPosts.num; i++) {
-    if(stringBeginsWith(allPosts.posts[i]->uri, type)) {
-      singlePost = i;
+    // Determine whether printing single post or front page
+    int singlePost = -2;
+    for(int i = 0; i < allPosts.num; i++) {
+        if(stringBeginsWith(allPosts.posts[i]->uri, type)) {
+            singlePost = i;
+        }
     }
-  }
-  if(stringsAreEqual(type, "/")) { singlePost = -1; }  // All URIs begin with '/'!
+    if(stringsAreEqual(type, "/")) { singlePost = -1; }  // All URIs begin with '/'!
 
 
-  if(!stringsAreEqual(type, "/") && singlePost == -2) {  // URI not "/", and no match found in allPosts
+    if(!stringsAreEqual(type, "/") && singlePost == -2) {  // URI not "/", and no match found in allPosts
         printf("Content-Type: text/html;\ncharset=UTF-8\n");
         printf("Status: 200 OK\n\n");
         printf("Page not found! %s", type);
-  } else if(stringsAreEqual(type, "/admin")) {
+    } else if(stringsAreEqual(type, "/admin")) {
         printf("Content-Type: text/html;\ncharset=UTF-8\n");
         printf("Status: 200 OK\n\n");
         printf("You're in the secret admin area!\n");
-  } else {
+    } else {
         printf("Content-Type: text/html;\ncharset=UTF-8\n");
         printf("Status: 200 OK\n\n");
         printf("<!DOCTYPE html>\n");
@@ -148,7 +148,7 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
         printf("  </fieldset>\n");
         printf("</aside>\n");
         printf("\n");
-        
+
         if(singlePost == -1) {
             for(int i = 0; i < allPosts.num; i++) {
                 printf("<article>\n");
@@ -157,8 +157,8 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
                 printf("%s", allPosts.posts[i]->title);
                 printf("</h3>\n");
                 printf("  <p>Date: %02d-%02d-%04d</p>\n", allPosts.posts[i]->dateDay,
-                                                          allPosts.posts[i]->dateMonth,
-                                                          allPosts.posts[i]->dateYear);
+                       allPosts.posts[i]->dateMonth,
+                       allPosts.posts[i]->dateYear);
                 printf("  <p>Author: %s</p>\n", allPosts.posts[i]->author);
                 printf("  %s\n", allPosts.posts[i]->body);
                 printf("  </fieldset>\n");
@@ -166,19 +166,19 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
                 printf("\n");          
             }
         } else {
-                printf("<article>\n");
-                printf("  <fieldset>\n");
-                printf("  <h3>");
-                printf("%s", allPosts.posts[singlePost]->title);
-                printf("</h3>\n");
-                printf("  <p>Date: %02d-%02d-%04d</p>\n", allPosts.posts[singlePost]->dateDay,
-                                                          allPosts.posts[singlePost]->dateMonth,
-                                                          allPosts.posts[singlePost]->dateYear);
-                printf("  <p>Author: %s</p>\n", allPosts.posts[singlePost]->author);
-                printf("  %s\n", allPosts.posts[singlePost]->body);
-                printf("  </fieldset>\n");
-                printf("</article>\n");
-                printf("\n");     
+            printf("<article>\n");
+            printf("  <fieldset>\n");
+            printf("  <h3>");
+            printf("%s", allPosts.posts[singlePost]->title);
+            printf("</h3>\n");
+            printf("  <p>Date: %02d-%02d-%04d</p>\n", allPosts.posts[singlePost]->dateDay,
+                   allPosts.posts[singlePost]->dateMonth,
+                   allPosts.posts[singlePost]->dateYear);
+            printf("  <p>Author: %s</p>\n", allPosts.posts[singlePost]->author);
+            printf("  %s\n", allPosts.posts[singlePost]->body);
+            printf("  </fieldset>\n");
+            printf("</article>\n");
+            printf("\n");     
         }
 
         printf("<footer>Request %d</footer>\n", *requestCount);
@@ -187,5 +187,5 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
         printf("\n");
         printf("</body>\n");
         printf("</html>\n");
-  }
+    }
 }
