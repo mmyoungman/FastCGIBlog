@@ -59,6 +59,7 @@ blogPosts loadPosts(char* postDir) {
         fp = fopen(path, "r");
         //if(fp == NULL) { return NULL; }
 
+        // TODO: Clean up so no non-alphanumeric characters are imported at the end of each string, specifically with the uri
         while(fgets(line, 1024, fp) != 0) {
             if(stringBeginsWith(line, "title:")) {
                 while(*line != ':') { line++; }

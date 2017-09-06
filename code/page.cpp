@@ -1,6 +1,7 @@
 int printPage(blogPosts allPosts, char* type, int* requestCount) {
     *requestCount += 1;
 
+    // TODO: Create listOfPages array? So contains "/", "/some-blog-post", /admin", etc.
     // Determine whether printing single post or front page
     int singlePost = -2;
     for(int i = 0; i < allPosts.num; i++) {
