@@ -1,3 +1,8 @@
+/*
+    TODO:   - Memory leaks?
+            - Make posts load periodically, or maybe on change to posts dir
+*/
+
 #include <fcgi_stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -106,8 +111,7 @@ blogPosts loadPosts(char* postDir) {
         int newestDay = -1;
         int newestMonth = -1;
         int newestYear = -1;
-        int j = i;
-        for(j = i; j < postsObj.num; j++) {
+        for(int j = i; j < postsObj.num; j++) {
             if((newestYear < postsObj.posts[j]->dateYear) || 
                (newestYear == postsObj.posts[j]->dateYear && newestMonth < postsObj.posts[j]->dateMonth) ||
                (newestMonth == postsObj.posts[j]->dateMonth && newestDay < postsObj.posts[j]->dateDay)) {
@@ -121,7 +125,6 @@ blogPosts loadPosts(char* postDir) {
         postsObj.posts[i] = postsObj.posts[newestIndex];
         postsObj.posts[newestIndex] = temp;
     }
-
     return postsObj;
 }
 
