@@ -1,6 +1,8 @@
 /*
-    TODO:   - Memory leaks?
-            - Make posts load periodically, or maybe on change to posts dir
+    TODO:   - Memory leaks on reloading posts?
+            - Post data currently only refreshes when restarting
+            - Remove dependency on spawn-fcgi
+            - Remove dependency on fcgi_studio.h
 */
 
 #include <fcgi_stdio.h>
@@ -129,7 +131,6 @@ blogPosts loadPosts(char* postDir) {
 }
 
 int main(int argc, char *argv[]) {
-
     blogPosts allPosts = loadPosts("../posts/");
 
     int requestCount = 0;
