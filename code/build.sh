@@ -6,5 +6,5 @@ cd ..
 mkdir -p build
 cd build
 
-g++ $debug $flags -lfcgi -o blog.fcgi ../code/main.cpp
-#g++ $debug $flags -lfcgi -o test ../code/test.cpp
+g++ $debug $flags  -o blog.fcgi ../code/main.cpp -lfcgi
+#g++ $debug $flags -o test ../code/test.cpp -lfcgi
