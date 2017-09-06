@@ -31,7 +31,7 @@ blogPosts loadPosts(char* postDir) {
 
     DIR *d;
     struct dirent *dir;
-    d = opendir("../posts/");
+    d = opendir(postDir);
     if(d) {
         while((dir = readdir(d)) != NULL) {
             if(stringsAreEqual(dir->d_name, ".") || stringsAreEqual(dir->d_name, "..") || !stringEndsWith(dir->d_name, ".txt")) {
@@ -53,7 +53,7 @@ blogPosts loadPosts(char* postDir) {
         FILE* fp;
         char* line = (char*)malloc(sizeof(char)*1024);
 
-        char* path = stringCopy("../posts/");
+        char* path = stringCopy(postDir);
         stringConcat(path, dirList[i]);
 
         fp = fopen(path, "r");
