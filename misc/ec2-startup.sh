@@ -8,6 +8,7 @@ sudo apt install nginx libfcgi-dev g++
 cd /home/ubuntu
 rm -rf fastcgi-blog
 git clone https://github.com/mmyoungman/fastcgi-blog.git
+chmod +x fastcgi-blog/misc/ec2-startup.sh
 sudo cp fastcgi-blog/misc/nginx.conf /etc/nginx/
 #sudo cp fastcgi-blog/misc/.htpasswd /etc/nginx/
 sudo systemctl restart nginx
