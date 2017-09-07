@@ -5,6 +5,7 @@
 sudo apt update
 sudo apt upgrade
 sudo apt install nginx libfcgi-dev g++
+cd /home/ubuntu
 rm -rf fastcgi-blog
 git clone https://github.com/mmyoungman/fastcgi-blog.git
 sudo cp fastcgi-blog/misc/nginx.conf /etc/nginx/
