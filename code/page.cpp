@@ -151,8 +151,7 @@ int printPage(blogPosts allPosts, char* type, int* requestCount) {
         printf("\n");
 
         if(singlePost == -1) {
-            // TODO: Do you really want to display all posts on the front page? I think not
-            for(int i = 0; i < allPosts.num; i++) {
+            for(int i = 0; i < allPosts.num || i < 5; i++) {
                 printf("<article>\n");
                 printf("  <fieldset>\n");
                 printf("  <h3>");

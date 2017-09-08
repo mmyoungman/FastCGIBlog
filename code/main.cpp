@@ -94,6 +94,7 @@ blogPosts loadPosts(char* postDir) {
             }
             else if(stringBeginsWith(line, "body:")) {
                 while(fgets(line, 1024, fp) != 0) {
+                    // Add "<br>" for each line in the body?
                     if(stringsAreEqual(postsObj.posts[i]->body, "")) {
                         postsObj.posts[i]->body = stringCopy(line);
                     }
@@ -116,7 +117,7 @@ blogPosts loadPosts(char* postDir) {
         for(int j = i; j < postsObj.num; j++) {
             if((newestYear < postsObj.posts[j]->dateYear) || 
                (newestYear == postsObj.posts[j]->dateYear && newestMonth < postsObj.posts[j]->dateMonth) ||
-               (newestMonth == postsObj.posts[j]->dateMonth && newestDay < postsObj.posts[j]->dateDay)) {
+               (newestYear == postsObj.posts[j]->dateYear && newestMonth == postsObj.posts[j]->dateMonth && newestDay < postsObj.posts[j]->dateDay)) {
                 newestIndex = j;
                 newestYear = postsObj.posts[j]->dateYear;
                 newestMonth = postsObj.posts[j]->dateMonth;
