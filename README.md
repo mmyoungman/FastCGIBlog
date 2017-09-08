@@ -8,7 +8,7 @@
 
 # How to run the website
 
-* Put misc/nginx.conf in /etc/nginx
+* Put misc/nginx.conf in /etc/nginx (You'll need to remove some things from it because it's set up to work on an EC2 instance!)
 * Generate .htpasswd using apache2-utils (sudo htpasswd -c /etc/nginx/.htpasswd admin)
 * sudo systemctl start nginx
 * ./code/build.sh
