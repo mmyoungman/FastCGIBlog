@@ -157,5 +157,5 @@ Using this information you can turn any pin on or off. For example, to turn pin 
 Next time we’ll explore how the pinMode function works.<br>
 <br>
 Sources:<br>
-<a href="https://www.youtube.com/channel/UC7uJBXcRdGlDlKIyr6ZbjBw">Robert Paz's Arduino Basic Lectures</a><br>
+<a href="https://www.youtube.com/channel/UC7uJBXcRdGlDlKIyr6ZbjBw">Robert Paz's Arduino Basics Lectures</a><br>
 <a href="http://garretlab.web.fc2.com/en/arduino/inside/index.html">GarretLab's Playing with Arduino Webpage</a><br>
