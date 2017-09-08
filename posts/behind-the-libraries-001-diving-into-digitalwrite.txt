@@ -31,7 +31,7 @@ By looking at the <a href="https://www.arduino.cc/en/uploads/Main/Arduino_Uno_Re
 <br>
 The datasheet (p116) tells us that the bit that controls the output of that pin is found at the address <a href="https://en.wikipedia.org/wiki/0x">0x</a>25. That hexidecimal address points to an 8-bit register, which is essentially a piece of memory that can store eight bits, eight 1’s and 0’s. According to the datasheet, the 5<sup>th</sup> bit stored in the register at address 0x25 controls whether pin 13 is on or off.<br>
 <br>
-<img src="http://www.theblinkingbreadboard.com/wp-content/uploads/2017/02/0001-PortBDatasheet.png"><br>
+<img src="0001-PortBDatasheet.png"><br>
 <br>
 <b>NOTE</b>: While the standard PC contains only one memory space, the ATmega328p actually contains <a href="http://playground.arduino.cc/Learning/Memory">three separate memory spaces</a>. This introduces ambiguity, as the address 0x25 can refer to multiple pieces of memory. When we deference the 0x25 pointer in this case, however, the <a href="https://en.wikipedia.org/wiki/Compiler">compiler</a> gives us access to SRAM, which is what we want.<br>
 <br>
