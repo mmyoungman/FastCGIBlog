@@ -121,7 +121,7 @@ As the DDR and PORT registers controlled the mode and output of the Arduino's pi
 <br>
 We're going to be reading the value of pin 12. To help us do this, I've created a simple circuit so we can turn pin 12 on or off using a button.<br>
 <br>
-<img src="http://www.theblinkingbreadboard.com/wp-content/uploads/2017/02/0003-ButtonCircuitDiagram.png"><br>
+<img src="0003-ButtonCircuitDiagram.png"><br>
 <br>
 I've used an 100k resistor. Pin 12 will be HIGH when the button isn't pressed, and LOW when it is.<br>
 <br>
