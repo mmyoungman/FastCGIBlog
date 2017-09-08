@@ -1,5 +1,5 @@
 title: Behind the Libraries Part 2 -- Plunge into pinMode
-uri:/behind-the-libraries-plunge-into-pinomde
+uri:/behind-the-libraries-plunge-into-pinmode
 author:Mark
 date:07-08-2017
 body:
