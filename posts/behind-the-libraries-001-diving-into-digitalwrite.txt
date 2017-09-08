@@ -27,7 +27,7 @@ On an Arduino Uno, this bit of memory is located on the ATmega328p chip that is 
 <br>
 By looking at the <a href="https://www.arduino.cc/en/uploads/Main/Arduino_Uno_Rev3-schematic.pdf">Arduino's schematics</a> (or elsewhere), we can discover that pin 13 is connected to the PB5 pin (or PORTB5) of the ATmega328p chip. <br>
 <br>
-<img src="images/0001-pin13topb5fromschematic-300x289.png"><br>
+<img src="images/0001-pin13topb5fromschematic.png"><br>
 <br>
 The datasheet (p116) tells us that the bit that controls the output of that pin is found at the address <a href="https://en.wikipedia.org/wiki/0x">0x</a>25. That hexidecimal address points to an 8-bit register, which is essentially a piece of memory that can store eight bits, eight 1’s and 0’s. According to the datasheet, the 5<sup>th</sup> bit stored in the register at address 0x25 controls whether pin 13 is on or off.<br>
 <br>
