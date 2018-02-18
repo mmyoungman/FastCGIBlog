@@ -1,6 +1,0 @@
-title:This is another blog post!!!
-uri:/this-is-another-blog-post
-author:Mark2
-date:26-07-2017
-body:
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.

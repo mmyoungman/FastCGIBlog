@@ -1,16 +1,6 @@
+# Universal tags file
+tags
+
 # Binaries
-blog.fcgi
-test
+build/
 
-# Qt Creator
-Blog.config
-Blog.creator
-Blog.creator.user
-Blog.files
-Blog.includes
-
-FastCGIBlog-test.config
-FastCGIBlog-test.creator
-FastCGIBlog-test.creator.user
-FastCGIBlog-test.files
-FastCGIBlog-test.includes
