@@ -44,18 +44,6 @@ typedef struct {
 //#define FCGI_MAXTYPE (FCGI_UNKNOWN_TYPE)
 
 typedef struct {
-   unsigned char version;
-   unsigned char type;
-   unsigned char requestIdB1;
-   unsigned char requestIdB0;
-   unsigned char contentLengthB1;
-   unsigned char contentLengthB0;
-   unsigned char paddingLength;
-   unsigned char reserved;
-   unsigned char contentData[8];
-} FCGI_Record;
-
-typedef struct {
    unsigned char roleB1;
    unsigned char roleB0;
    unsigned char flags;
@@ -161,6 +149,7 @@ int main()
          }
 
          // INFO: Loop over fcgi records until all packets bytes have been consumed
+         // TODO: Handle multiple requestIds
          void *data_ptr = buffer;
          while(status > 0) {
             FCGI_Header *header = (FCGI_Header*) data_ptr;
@@ -169,11 +158,22 @@ int main()
 
             u16 requestId = (header->requestIdB1 << 8) + header->requestIdB0;
             u16 contentLength = (header->contentLengthB1 << 8) + header->contentLengthB0;
-            //u8 paddingLength = header->paddingLength;
+            u8 paddingLength = header->paddingLength;
+
+            data_ptr += FCGI_HEADER_LEN;
+
+            u16 role;
+            u8 flags;
+            FCGI_BeginRequestBody *begin;
 
             switch(header->type) {
                case FCGI_BEGIN_REQUEST:
                      dbg("FCGI_BEGIN_REQUEST");
+                     begin = (FCGI_BeginRequestBody*) data_ptr;
+                     role = (begin->roleB1 << 8) + begin->roleB0;
+                     flags = begin->flags;
+                     dbg("role: %d", role);
+                     dbg("flags: %d", flags);
                      break;
                case FCGI_ABORT_REQUEST:
                      dbg("FCGI_ABORT_REQUEST");
@@ -206,29 +206,10 @@ int main()
             status -= FCGI_HEADER_LEN + contentLength;
             dbg("bytes consumed this record: %d", FCGI_HEADER_LEN + contentLength);
             dbg("bytes left to consume: %d", status);
-            data_ptr += FCGI_HEADER_LEN + contentLength;
+            data_ptr += contentLength;
 
             assert(status >= 0);
          }
-
-         //FCGI_Record *record;
-         //record = (FCGI_Record*) buffer;
-         //
-         //assert(record->version == FCGI_VERSION_1);
-
-         //dbg("recv status: %d", status);
-
-         //dbg("version: %d", record->version);
-         //dbg("type: %d", record->type);
-
-         //u16 requestId = (record->requestIdB1 << 8) + record->requestIdB0;
-         //dbg("requestId: %d", requestId);
-
-         //u16 contentLength = (record->contentLengthB1 << 8) + record->contentLengthB0;
-         //dbg("contentLength: %d", contentLength);
-
-         //dbg("paddingLength: %d", record->paddingLength);
-         //dbg("reserved: %d", record->reserved);
 
          //FCGI_BeginRequestBody *begin = (FCGI_BeginRequestBody*) &(record->contentData);
          //u16 role = (begin->roleB1 << 8) + begin->roleB0;
