@@ -1,7 +1,6 @@
 // Created by Mark Youngman 18 Feb 2018
 
 #include "lib-mmy.h"
-//#include <string.h> // for memset()
 #include <sys/types.h>
 #include <sys/wait.h> // for waitpid()
 #include <sys/socket.h>
@@ -12,6 +11,10 @@
 #define BACKLOG 10
 
 // http://www.mit.edu/~yandros/doc/specs/fcgi-spec.html
+#define FCGI_VERSION_1     1
+
+// Listening socket file number
+#define FCGI_LISTENSOCK_FILENO   0
 
 typedef struct {
    unsigned char version;
@@ -22,7 +25,23 @@ typedef struct {
    unsigned char contentLengthB0;
    unsigned char paddingLength;
    unsigned char reserved;
-} fcgi_header;
+} FCGI_Header;
+
+#define FCGI_HEADER_LEN    8
+
+// Values for fcgi_header type 
+#define FCGI_BEGIN_REQUEST       1
+#define FCGI_ABORT_REQUEST       2
+#define FCGI_END_REQUEST         3
+#define FCGI_PARAMS              4
+#define FCGI_STDIN               5
+#define FCGI_STDOUT              6
+#define FCGI_STDERR              7
+#define FCGI_DATA                8
+#define FCGI_GET_VALUES          9
+#define FCGI_GET_VALUES_RESULT  10
+#define FCGI_UNKNOWN_TYPE       11
+//#define FCGI_MAXTYPE (FCGI_UNKNOWN_TYPE)
 
 typedef struct {
    unsigned char version;
@@ -141,55 +160,105 @@ int main()
             return 1;
          }
 
-         // TODO: Loop over fcgi records until all packets bytes have been consumed
-         FCGI_Record *record;
-         record = (FCGI_Record*) buffer;
-         
-         assert(record->version == 1);
+         // INFO: Loop over fcgi records until all packets bytes have been consumed
+         void *data_ptr = buffer;
+         while(status > 0) {
+            FCGI_Header *header = (FCGI_Header*) data_ptr;
 
-         dbg("recv status: %d", status);
+            assert(header->version == FCGI_VERSION_1);
 
-         dbg("version: %d", record->version);
-         dbg("type: %d", record->type);
+            u16 requestId = (header->requestIdB1 << 8) + header->requestIdB0;
+            u16 contentLength = (header->contentLengthB1 << 8) + header->contentLengthB0;
+            //u8 paddingLength = header->paddingLength;
 
-         u16 requestId = (record->requestIdB1 << 8) + record->requestIdB0;
-         dbg("requestId: %d", requestId);
+            switch(header->type) {
+               case FCGI_BEGIN_REQUEST:
+                     dbg("FCGI_BEGIN_REQUEST");
+                     break;
+               case FCGI_ABORT_REQUEST:
+                     dbg("FCGI_ABORT_REQUEST");
+                     break;
+               case FCGI_PARAMS:
+                     dbg("FCGI_PARAMS");
+                     break;
+               case FCGI_STDIN:
+                     dbg("FCGI_STDIN");
+                     break;
+               case FCGI_STDOUT:
+                     dbg("FCGI_STDOUT");
+                     break;
+               case FCGI_DATA:
+                     dbg("FCGI_DATA");
+                     break;
+               case FCGI_GET_VALUES:
+                     dbg("FCGI_GET_VALUES");
+                     break;
+               case FCGI_GET_VALUES_RESULT:
+                     dbg("FCGI_GET_VALUES_RESULT");
+                     break;
+               case FCGI_UNKNOWN_TYPE:
+                     dbg("FCGI_UNKNOWN_TYPE");
+                     break;
+               default:
+                     break;
+            }
 
-         u16 contentLength = (record->contentLengthB1 << 8) + record->contentLengthB0;
-         dbg("contentLength: %d", contentLength);
+            status -= FCGI_HEADER_LEN + contentLength;
+            dbg("bytes consumed this record: %d", FCGI_HEADER_LEN + contentLength);
+            dbg("bytes left to consume: %d", status);
+            data_ptr += FCGI_HEADER_LEN + contentLength;
 
-         dbg("paddingLength: %d", record->paddingLength);
-         dbg("reserved: %d", record->reserved);
-
-         FCGI_BeginRequestBody *begin = (FCGI_BeginRequestBody*) &(record->contentData);
-         u16 role = (begin->roleB1 << 8) + begin->roleB0;
-         dbg("role: %d", role);
-         dbg("flags: %d", begin->flags);
-
-         unsigned char *ptr = (unsigned char*)record;
-         ptr += 16; // jump to next fcgi record (8 bytes for fcgi header, 8 bytes of data)
-         FCGI_Record *nextrecord = (FCGI_Record*) ptr;
-
-         dbg("Should now go on to the FCGI_PARAMS record...");
-         dbg("version: %d", nextrecord->version);
-         dbg("type: %d", nextrecord->type);
-
-         requestId = (nextrecord->requestIdB1 << 8) + nextrecord->requestIdB0;
-         dbg("requestId: %d", requestId);
-
-         contentLength = (nextrecord->contentLengthB1 << 8) + nextrecord->contentLengthB0;
-         dbg("contentLength: %d", contentLength);
-
-         dbg("paddingLength: %d", nextrecord->paddingLength);
-         dbg("reserved: %d", nextrecord->reserved);
-
-         ptr += 8;
-
-         // TODO: Process name-value pairs: http://www.mit.edu/~yandros/doc/specs/fcgi-spec.html#S3.4
-         for(int i = 0; i < 688; i++) {
-            printf("%c", *ptr);
-            ptr++;
+            assert(status >= 0);
          }
+
+         //FCGI_Record *record;
+         //record = (FCGI_Record*) buffer;
+         //
+         //assert(record->version == FCGI_VERSION_1);
+
+         //dbg("recv status: %d", status);
+
+         //dbg("version: %d", record->version);
+         //dbg("type: %d", record->type);
+
+         //u16 requestId = (record->requestIdB1 << 8) + record->requestIdB0;
+         //dbg("requestId: %d", requestId);
+
+         //u16 contentLength = (record->contentLengthB1 << 8) + record->contentLengthB0;
+         //dbg("contentLength: %d", contentLength);
+
+         //dbg("paddingLength: %d", record->paddingLength);
+         //dbg("reserved: %d", record->reserved);
+
+         //FCGI_BeginRequestBody *begin = (FCGI_BeginRequestBody*) &(record->contentData);
+         //u16 role = (begin->roleB1 << 8) + begin->roleB0;
+         //dbg("role: %d", role);
+         //dbg("flags: %d", begin->flags);
+
+         //unsigned char *ptr = (unsigned char*)record;
+         //ptr += 16; // jump to next fcgi record (8 bytes for fcgi header, 8 bytes of data)
+         //FCGI_Record *nextrecord = (FCGI_Record*) ptr;
+
+         //dbg("Should now go on to the FCGI_PARAMS record...");
+         //dbg("version: %d", nextrecord->version);
+         //dbg("type: %d", nextrecord->type);
+
+         //requestId = (nextrecord->requestIdB1 << 8) + nextrecord->requestIdB0;
+         //dbg("requestId: %d", requestId);
+
+         //contentLength = (nextrecord->contentLengthB1 << 8) + nextrecord->contentLengthB0;
+         //dbg("contentLength: %d", contentLength);
+
+         //dbg("paddingLength: %d", nextrecord->paddingLength);
+         //dbg("reserved: %d", nextrecord->reserved);
+
+         //ptr += 8;
+
+         //// TODO: Process name-value pairs: http://www.mit.edu/~yandros/doc/specs/fcgi-spec.html#S3.4
+         //for(int i = 0; i < 688; i++) {
+         //   printf("%c", *ptr);
+         //   ptr++;
+         //}
 
          // TODO: Send response packet
          //status = send(newfd, &buffer, status, 0);
