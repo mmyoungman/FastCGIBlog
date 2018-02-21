@@ -291,7 +291,7 @@ int main()
          }
 
          // TODO: Send response packet
-         char *sendContent = str_copy("Content-type: text/html\r\n\r\n<html><h2>Does this work?</h1></html>");
+         char *sendContent = str_copy("Content-type: text/html; charset=UTF-8\nStatus: 200 OK\r\n\r\n<!DOCTYPE html>\n<html><head><title>TEST</title></head><body><h2>Does this work?</h2></body></html>");
          
          void *sendData = malloc(megabytes(1));
          FCGI_Header *sendH = (FCGI_Header*) sendData;
