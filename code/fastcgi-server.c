@@ -280,7 +280,7 @@ int main()
          
          void *sendData = malloc(megabytes(1));
          FCGI_Header *sendH = (FCGI_Header*) sendData;
-         sendH->version = FCGI_VERSION_1;
+         sendH->version = (char)FCGI_VERSION_1;
          sendH->type = FCGI_STDOUT;
          sendH->requestIdB1 = 0;
          sendH->requestIdB0 = 1;
@@ -289,9 +289,10 @@ int main()
          sendH->paddingLength = 0;
          sendH->reserved = 0;
 
-         char *sendPtr = (char*) sendData + sizeof(FCGI_Header);
+         unsigned char *sendPtr = ((unsigned char*) sendData);
+         sendPtr += 8; //  + sizeof(FCGI_Header);
          int len = str_len(sendContent);
-         for(int i = 0; i < len; i++) {
+         for(int i = 0; i < len+1; i++) {
             *sendPtr = *sendContent;
             sendPtr++, sendContent++;
          }
@@ -306,7 +307,7 @@ int main()
          empSTDOUT->paddingLength = 0;
          empSTDOUT->reserved = 0;
 
-         FCGI_Header *empENDREQ = (FCGI_Header*) (sendPtr + sizeof(FCGI_Header));
+         FCGI_Header *empENDREQ = (FCGI_Header*) (sendPtr + 8); //sizeof(FCGI_Header));
          empENDREQ->version = FCGI_VERSION_1;
          empENDREQ->type = FCGI_END_REQUEST;
          empENDREQ->requestIdB1 = 0;
@@ -317,10 +318,13 @@ int main()
          empENDREQ->reserved = 0;
 
          u64 packLen = ((u64)sendPtr + 2*sizeof(FCGI_Header)) - (u64)sendData;
-         dbg("sendContent len: %d", len);
+         dbg("sendContent len: %d", len+1);
          dbg("packLen: %d", packLen);
 
-         status = send(newfd, &sendData, packLen, 0);
+         //unsigned char *a = (unsigned char*) sendData;
+         //*a = 1;
+
+         status = send(newfd, sendData, packLen, 0);
          //memset(buffer, 0, sizeof(char) * 4096);
       }
 
