@@ -50,6 +50,21 @@ typedef struct {
    unsigned char reserved[5];
 } FCGI_BeginRequestBody;
 
+typedef struct {
+   unsigned char appStatusB3;
+   unsigned char appStatusB2;
+   unsigned char appStatusB1;
+   unsigned char appStatusB0;
+   unsigned char protocolStatus;
+   unsigned char reserved[3];
+} FCGI_EndRequestBody;
+
+// Values for fcgi_endrequestbody protocolStatus
+#define FCGI_REQUEST_COMPLETE 0
+#define FCGI_CANT_MPX_CONN    1
+#define FCGI_OVERLOADED       2
+#define FCGI_UNKNOWN_ROLE     3
+
 int main()
 {
    int status;
@@ -276,7 +291,7 @@ int main()
          }
 
          // TODO: Send response packet
-         char *sendContent = str_copy("HTTP/1.1 200 OK\n\n<html><h2>Does this work?</h1></html>");
+         char *sendContent = str_copy("Content-type: text/html\r\n\r\n<html><h2>Does this work?</h1></html>");
          
          void *sendData = malloc(megabytes(1));
          FCGI_Header *sendH = (FCGI_Header*) sendData;
@@ -286,17 +301,25 @@ int main()
          sendH->requestIdB0 = 1;
          sendH->contentLengthB1 = 0;
          sendH->contentLengthB0 = str_len(sendContent);
-         sendH->paddingLength = 0;
+         sendH->paddingLength = 8 - (str_len(sendContent) % 8);
          sendH->reserved = 0;
 
          unsigned char *sendPtr = ((unsigned char*) sendData);
-         sendPtr += 8; //  + sizeof(FCGI_Header);
+         sendPtr += sizeof(FCGI_Header);
          int len = str_len(sendContent);
          for(int i = 0; i < len+1; i++) {
             *sendPtr = *sendContent;
             sendPtr++, sendContent++;
          }
+
+         len += sendH->paddingLength;
+
+         for(int i = 0; i < sendH->paddingLength; i++) {
+            *sendPtr = 0;
+            sendPtr++;
+         }
          
+         sendPtr--;
          FCGI_Header *empSTDOUT = (FCGI_Header*) sendPtr;
          empSTDOUT->version = FCGI_VERSION_1;
          empSTDOUT->type = FCGI_STDOUT;
@@ -313,19 +336,23 @@ int main()
          empENDREQ->requestIdB1 = 0;
          empENDREQ->requestIdB0 = 1;
          empENDREQ->contentLengthB1 = 0;
-         empENDREQ->contentLengthB0 = 0;
+         empENDREQ->contentLengthB0 = 8;
          empENDREQ->paddingLength = 0;
          empENDREQ->reserved = 0;
 
-         u64 packLen = ((u64)sendPtr + 2*sizeof(FCGI_Header)) - (u64)sendData;
+         FCGI_EndRequestBody *endReqBody = (FCGI_EndRequestBody*) (sendPtr + 16);
+         endReqBody->appStatusB3 = 0; 
+         endReqBody->appStatusB2 = 0; 
+         endReqBody->appStatusB1 = 0; 
+         endReqBody->appStatusB0 = 0; 
+         endReqBody->protocolStatus = FCGI_REQUEST_COMPLETE; 
+
+         u64 packLen = ((u64)sendPtr + 3*sizeof(FCGI_Header)) - (u64)sendData;
          dbg("sendContent len: %d", len+1);
          dbg("packLen: %d", packLen);
 
-         //unsigned char *a = (unsigned char*) sendData;
-         //*a = 1;
-
          status = send(newfd, sendData, packLen, 0);
-         //memset(buffer, 0, sizeof(char) * 4096);
+         memset(buffer, 0, sizeof(char) * 4096);
       }
 
       dbg("Connection closed!");
