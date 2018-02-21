@@ -133,11 +133,11 @@ int main()
          continue;
       }
 
-      // TODO: child doesn't need sockfd, so free()?
+      // TODO: child doesn't need sockfd?
 
       dbg("Connection accepted!");
 
-      // TODO: Handle data spread over multiple packets
+      // TODO: Handle data spread over multiple packets?
       int bufferLen = 4096;
       char buffer[bufferLen];
       while ((status = recv(newfd, &buffer, bufferLen, 0)) != 0)
@@ -166,6 +166,13 @@ int main()
             u8 flags;
             FCGI_BeginRequestBody *begin;
 
+            unsigned char *param_ptr;
+            u32 param_pos;
+            u32 nameLength;
+            u32 valueLength;
+            char *param_name;
+
+
             switch(header->type) {
                case FCGI_BEGIN_REQUEST:
                      dbg("FCGI_BEGIN_REQUEST");
@@ -180,6 +187,63 @@ int main()
                      break;
                case FCGI_PARAMS:
                      dbg("FCGI_PARAMS");
+                     // TODO: Process name-value pairs
+                     // format: nameLengthBX, valueLengthBX, nameData[nameLength], valueData[valueLength]
+                     param_ptr = (unsigned char*)data_ptr;
+                     param_pos = contentLength;
+                     while(param_pos > 0) {
+                        nameLength = 0;
+                        valueLength = 0;
+                        if((*param_ptr >> 7) == 0) {
+                           nameLength = *param_ptr;
+                           param_ptr++;
+                           param_pos -= 1;
+                        } else {
+                           nameLength += (*param_ptr & 0x7f) << 24; // nameLengthB3
+                           param_ptr++;
+                           nameLength += *param_ptr << 16; // nameLengthB2
+                           param_ptr++;
+                           nameLength += *param_ptr << 8; // nameLengthB1
+                           param_ptr++;
+                           nameLength += *param_ptr; // nameLengthB0
+                           param_ptr++;
+                           param_pos -= 4;
+                        }
+                        dbg("nameLength: %d", nameLength);
+
+                        if((*param_ptr >> 7) == 0) {
+                           valueLength = *param_ptr;            
+                           param_ptr++;
+                           param_pos -= 1;
+                        } else {
+                           valueLength += (*param_ptr & 0x7f) << 24; // valueLengthB3
+                           param_ptr++;
+                           valueLength += *param_ptr << 16; // valueLengthB2
+                           param_ptr++;
+                           valueLength += *param_ptr << 8; // valueLengthB1
+                           param_ptr++;
+                           valueLength += *param_ptr; // valueLengthB0
+                           param_ptr++;
+                           param_pos -= 4;
+                        }
+                        dbg("valueLength: %d", valueLength);
+
+                        dbg("param_name:");
+                        for(int i = 0; i < nameLength; i++) {
+                           printf("%c", *param_ptr);
+                           //dbg("%c", *param_ptr);
+                           param_ptr++;
+                        }
+                        printf("\n", *param_ptr);
+                        dbg("param_value:");
+                        for(int i = 0; i < valueLength; i++) {
+                           printf("%c", *param_ptr);
+                           param_ptr++;
+                        }
+                        printf("\n", *param_ptr);
+                        
+                        param_pos -= nameLength + valueLength;
+                     }
                      break;
                case FCGI_STDIN:
                      dbg("FCGI_STDIN");
@@ -203,47 +267,61 @@ int main()
                      break;
             }
 
-            status -= FCGI_HEADER_LEN + contentLength;
-            dbg("bytes consumed this record: %d", FCGI_HEADER_LEN + contentLength);
+            status -= FCGI_HEADER_LEN + contentLength + paddingLength;
+            dbg("bytes consumed this record: %d", FCGI_HEADER_LEN + contentLength + paddingLength);
             dbg("bytes left to consume: %d", status);
-            data_ptr += contentLength;
+            data_ptr += contentLength + paddingLength;
 
             assert(status >= 0);
          }
 
-         //FCGI_BeginRequestBody *begin = (FCGI_BeginRequestBody*) &(record->contentData);
-         //u16 role = (begin->roleB1 << 8) + begin->roleB0;
-         //dbg("role: %d", role);
-         //dbg("flags: %d", begin->flags);
-
-         //unsigned char *ptr = (unsigned char*)record;
-         //ptr += 16; // jump to next fcgi record (8 bytes for fcgi header, 8 bytes of data)
-         //FCGI_Record *nextrecord = (FCGI_Record*) ptr;
-
-         //dbg("Should now go on to the FCGI_PARAMS record...");
-         //dbg("version: %d", nextrecord->version);
-         //dbg("type: %d", nextrecord->type);
-
-         //requestId = (nextrecord->requestIdB1 << 8) + nextrecord->requestIdB0;
-         //dbg("requestId: %d", requestId);
-
-         //contentLength = (nextrecord->contentLengthB1 << 8) + nextrecord->contentLengthB0;
-         //dbg("contentLength: %d", contentLength);
-
-         //dbg("paddingLength: %d", nextrecord->paddingLength);
-         //dbg("reserved: %d", nextrecord->reserved);
-
-         //ptr += 8;
-
-         //// TODO: Process name-value pairs: http://www.mit.edu/~yandros/doc/specs/fcgi-spec.html#S3.4
-         //for(int i = 0; i < 688; i++) {
-         //   printf("%c", *ptr);
-         //   ptr++;
-         //}
-
          // TODO: Send response packet
-         //status = send(newfd, &buffer, status, 0);
-         memset(buffer, 0, sizeof(char) * 4096);
+         char *sendContent = str_copy("HTTP/1.1 200 OK\n\n<html><h2>Does this work?</h1></html>");
+         
+         void *sendData = malloc(megabytes(1));
+         FCGI_Header *sendH = (FCGI_Header*) sendData;
+         sendH->version = FCGI_VERSION_1;
+         sendH->type = FCGI_STDOUT;
+         sendH->requestIdB1 = 0;
+         sendH->requestIdB0 = 1;
+         sendH->contentLengthB1 = 0;
+         sendH->contentLengthB0 = str_len(sendContent);
+         sendH->paddingLength = 0;
+         sendH->reserved = 0;
+
+         char *sendPtr = (char*) sendData + sizeof(FCGI_Header);
+         int len = str_len(sendContent);
+         for(int i = 0; i < len; i++) {
+            *sendPtr = *sendContent;
+            sendPtr++, sendContent++;
+         }
+         
+         FCGI_Header *empSTDOUT = (FCGI_Header*) sendPtr;
+         empSTDOUT->version = FCGI_VERSION_1;
+         empSTDOUT->type = FCGI_STDOUT;
+         empSTDOUT->requestIdB1 = 0;
+         empSTDOUT->requestIdB0 = 1;
+         empSTDOUT->contentLengthB1 = 0;
+         empSTDOUT->contentLengthB0 = 0;
+         empSTDOUT->paddingLength = 0;
+         empSTDOUT->reserved = 0;
+
+         FCGI_Header *empENDREQ = (FCGI_Header*) (sendPtr + sizeof(FCGI_Header));
+         empENDREQ->version = FCGI_VERSION_1;
+         empENDREQ->type = FCGI_END_REQUEST;
+         empENDREQ->requestIdB1 = 0;
+         empENDREQ->requestIdB0 = 1;
+         empENDREQ->contentLengthB1 = 0;
+         empENDREQ->contentLengthB0 = 0;
+         empENDREQ->paddingLength = 0;
+         empENDREQ->reserved = 0;
+
+         u64 packLen = ((u64)sendPtr + 2*sizeof(FCGI_Header)) - (u64)sendData;
+         dbg("sendContent len: %d", len);
+         dbg("packLen: %d", packLen);
+
+         status = send(newfd, &sendData, packLen, 0);
+         //memset(buffer, 0, sizeof(char) * 4096);
       }
 
       dbg("Connection closed!");
